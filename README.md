@@ -2,12 +2,12 @@ vim-wsl-clip
 ============
 
 vim-wsl-clip provides access to the Windows system clipboard for terminal Vim without clipboard support which is the default in WSL. Similar to
-setting `clipboard=unnamed` it automatically puts any yanked text into the system clipboard and contents of the system clipboard are
+setting `clipboard=unnamed` it automatically puts any yanked text into the system clipboard and the contents of the system clipboard are
 automatically available for putting using the normal put commands. No special keys are required. There is no requirement to install vim on
 WSL with clipboard support (i.e installing vim-gnome) or installing an X server.
 
-It relies on a new feature of vim so it required vim with patch 8.0.1394. `echo has('patch-8.0.1394')` should return 1. The current default
-install of vim on Ubuntu 18.04 for WSL has this patch.
+It relies on a new feature of vim so it requires Vim with patch 8.0.1394. `echo has('patch-8.0.1394')` should return 1. The current default
+install of Vim on Ubuntu 18.04 for WSL has this patch.
 
 Installation
 ------------
@@ -23,8 +23,8 @@ Dependencies
 
 ### Plugins
 
-For the automatic paste feature to work it requires a terminal that supports Focus Reporting as it relies on capturing FocusLost and
-FocusGained events. Terminal vim does not support these events by default. In order to get focus event support in terminal Vim install
+For the automatic paste feature to work it requires a terminal that supports Focus Reporting as it relies on capturing `FocusLost` and
+`FocusGained` events. Terminal vim does not support these events by default. In order to get focus event support in terminal Vim install
 [https://github.com/pnetherwood/vim-term-focus](https://github.com/pnetherwood/vim-term-focus). This plugin describes how to check whether
 your terminal supports Focus Reporting. On Windows [WSLtty](https://github.com/mintty/wsltty) is your best option for a terminal emulator
 that supports Focus Reporting as the default terminals do not.
@@ -61,7 +61,7 @@ will not be updated.
 
 If the system clipboard is modified outside of Vim then the system clipboard is put into the unnamed " register. This differs from the
 behaviour of the option `clipboard=unnamed` which places the system clipboard in the * register. However the behaviour appears to be the
-same in that if you copy something into the system clipboard outside of your terminal is is immediately available for pasting with the put
+same in that if you copy something into the system clipboard outside of your terminal it is immediately available for pasting with the put
 command. The unnamed register has to be used to maintain this behaviour in Vim with no clipboard as there is no * and + registers.
 
 If you shift focus out of the terminal and the system clipboard does not change then the existing content of the unnamed register is
