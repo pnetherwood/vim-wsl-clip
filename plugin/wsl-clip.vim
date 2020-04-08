@@ -6,10 +6,14 @@
 " Location:	plugin/wsl-clip.vim
 " Website:	https://github.com/pnetherwood/vim-wsl-clip
 
-if exists("g:loaded_wsl_clip") || !has('patch-8.0.1394') || has("clipboard") || &compatible
-    finish
+if exists("g:loaded_wsl_clip")
+  finish
 endif
 let g:loaded_wsl_clip = 1
+
+if !has('patch-8.0.1394') || has("clipboard") || !has('unix') || system('uname -a') !~ 'Microsoft' || &compatible
+  finish
+endif
 
 let s:save_cpo = &cpo
 set cpo&vim
