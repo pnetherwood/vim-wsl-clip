@@ -18,8 +18,10 @@ endif
 let s:save_cpo = &cpo
 set cpo&vim
 
-let default_set_cmd = 'clip.exe'
-let default_get_cmd = 'powershell.exe -Command Get-Clipboard'
+let win32Path = split(system('grep "C:" /etc/mtab'))[1] . '/Windows/System32/'
+
+let default_set_cmd = win32Path . 'clip.exe'
+let default_get_cmd = win32Path . 'WindowsPowerShell/v1.0/powershell.exe -Command Get-Clipboard'
 if executable('win32yank.exe')
   let default_set_cmd = 'win32yank.exe -i --crlf'
   let default_get_cmd = 'win32yank.exe -o --lf'
@@ -64,6 +66,7 @@ function! s:UpdateClipboard()
   " Only set the clipboard if its changed. Its likely that if the system clipboard hasn't changed then 
   " you'll want to keep the contents of the paste register as is
   if clipboard !=# g:last_clipboard
+    let clipboard = substitute(clipboard, '\r', '', '')
     call setreg(g:wsl_clip_default_paste_register, clipboard)    
   endif
 endfunction
