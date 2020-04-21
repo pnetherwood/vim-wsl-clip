@@ -22,24 +22,27 @@ let win32Path = split(system('grep "C:" /etc/mtab'))[1] . '/Windows/System32/'
 
 let default_set_cmd = win32Path . 'clip.exe'
 let default_get_cmd = win32Path . 'WindowsPowerShell/v1.0/powershell.exe -Command Get-Clipboard'
+let default_strip_last_CRLF = 1
 if executable('win32yank.exe')
   let default_set_cmd = 'win32yank.exe -i --crlf'
   let default_get_cmd = 'win32yank.exe -o --lf'
+  let default_strip_last_CRLF  = 0
 endif
 
 let g:wsl_clip_clipboard_set = get(g:, 'wsl_clip_clipboard_set', default_set_cmd)
 let g:wsl_clip_clipboard_get = get(g:, 'wsl_clip_clipboard_get', default_get_cmd)
+let g:wsl_clip_strip_last_CRLF = get(g:, 'wsl_clip_strip_last_CRLF', default_strip_last_CRLF)
 
 " By default set the " register so that the default put command works
 let g:wsl_clip_default_paste_register = '"'
 
 if !executable(split(g:wsl_clip_clipboard_get)[0])   
-  echoerr "Clipboard get command missing, not in path or not executable: " . g:wsl_clip_clipboard_get
+  echom "Clipboard get command missing, not in path or not executable: " . g:wsl_clip_clipboard_get
   finish
 endif
 
 if !executable(split(g:wsl_clip_clipboard_set)[0])   
-  echoerr "Clipboard set command missing, not in path or not executable: " . g:wsl_clip_clipboard_set
+  echom "Clipboard set command missing, not in path or not executable: " . g:wsl_clip_clipboard_set
   finish
 endif
 
@@ -54,19 +57,22 @@ augroup WSLYank
   autocmd TextYankPost * call <SID>ClipboardSet(v:event.regname, v:event.regcontents)
 augroup END
 
-let g:last_clipboard = ""
+let s:last_clipboard = ""
 
 function! s:SaveClipboard()
   " Get the current system clip board to see if its changed when focus is regained
-  let g:last_clipboard = system(g:wsl_clip_clipboard_get)
+  let s:last_clipboard = system(g:wsl_clip_clipboard_get)
 endfunction
 
 function! s:UpdateClipboard()
   let clipboard = system(g:wsl_clip_clipboard_get)
   " Only set the clipboard if its changed. Its likely that if the system clipboard hasn't changed then 
   " you'll want to keep the contents of the paste register as is
-  if clipboard !=# g:last_clipboard
-    let clipboard = substitute(clipboard, '\r', '', '')
+  if clipboard !=# s:last_clipboard
+    if g:wsl_clip_strip_last_CRLF
+      let clipboard = substitute(clipboard, '\r\n$', '', '')
+    endif
+    let clipboard = substitute(clipboard, '\r', '', 'g')
     call setreg(g:wsl_clip_default_paste_register, clipboard)    
   endif
 endfunction
