@@ -11,7 +11,15 @@ if exists("g:loaded_wsl_clip")
 endif
 let g:loaded_wsl_clip = 1
 
-if !has('patch-8.0.1394') || has("clipboard") || !has('unix') || system('uname -a') !~ 'Microsoft' || &compatible
+let s:isWSL = 0
+if has("unix")
+  let lines = readfile("/proc/version")
+  if lines[0] =~ "Microsoft"
+    let s:isWSL = 1
+  endif
+endif
+
+if &compatible || !has('patch-8.0.1394') || has("clipboard") || !s:isWSL
   finish
 endif
 
@@ -59,27 +67,17 @@ augroup END
 
 let s:last_clipboard = ""
 
-function! s:SaveClipboard()
-  " Get the current system clip board to see if its changed when focus is regained
-  let s:last_clipboard = system(g:wsl_clip_clipboard_get)
-endfunction
-
 function! s:UpdateClipboard()
   let clipboard = system(g:wsl_clip_clipboard_get)
-  " Only set the clipboard if its changed. Its likely that if the system clipboard hasn't changed then 
-  " you'll want to keep the contents of the paste register as is
-  if clipboard !=# s:last_clipboard
-    if g:wsl_clip_strip_last_CRLF
-      let clipboard = substitute(clipboard, '\r\n$', '', '')
-    endif
-    let clipboard = substitute(clipboard, '\r', '', 'g')
-    call setreg(g:wsl_clip_default_paste_register, clipboard)    
+  if g:wsl_clip_strip_last_CRLF
+    let clipboard = substitute(clipboard, '\r\n$', '', '')
   endif
+  let clipboard = substitute(clipboard, '\r', '', 'g')
+  call setreg(g:wsl_clip_default_paste_register, clipboard)    
 endfunction
 
 augroup WSLPut
   autocmd!
-  autocmd FocusLost * call <SID>SaveClipboard()
   autocmd FocusGained * call <SID>UpdateClipboard()
 augroup END
 
