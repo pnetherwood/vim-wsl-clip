@@ -11,6 +11,10 @@ if exists("g:loaded_wsl_clip")
 endif
 let g:loaded_wsl_clip = 1
 
+if &compatible || !has('patch-8.0.1394') || has("clipboard")
+  finish
+endif
+
 let s:isWSL = 0
 if has("unix")
   let lines = readfile("/proc/version")
@@ -19,14 +23,20 @@ if has("unix")
   endif
 endif
 
-if &compatible || !has('patch-8.0.1394') || has("clipboard") || !s:isWSL
+if !s:isWSL
   finish
 endif
 
 let s:save_cpo = &cpo
 set cpo&vim
 
-let win32Path = split(system('grep "C:" /etc/mtab'))[1] . '/Windows/System32/'
+let win32Path = '/mnt/c/Windows/System32/'
+" Get the path to Windows executables from mtab in case user has overridden the default
+for  line in readfile('/etc/mtab')
+  if line =~ '^C:'
+    let win32Path = split(line, ' ')[1] . '/Windows/System32/'
+  endif
+endfor
 
 let default_set_cmd = win32Path . 'clip.exe'
 let default_get_cmd = win32Path . 'WindowsPowerShell/v1.0/powershell.exe -Command Get-Clipboard'
@@ -42,7 +52,9 @@ let g:wsl_clip_clipboard_get = get(g:, 'wsl_clip_clipboard_get', default_get_cmd
 let g:wsl_clip_strip_last_CRLF = get(g:, 'wsl_clip_strip_last_CRLF', default_strip_last_CRLF)
 
 " By default set the " register so that the default put command works
-let g:wsl_clip_default_paste_register = '"'
+let g:wsl_clip_default_paste_register = get(g:, 'wsl_clip_default_paste_register', '"')
+" Have an copy of the clipboard in extra register in case we accidentally override it with a delete
+let g:wsl_clip_extra_paste_register = get(g:, 'wsl_clip_extra_paste_register', '1')
 
 if !executable(split(g:wsl_clip_clipboard_get)[0])   
   echom "Clipboard get command missing, not in path or not executable: " . g:wsl_clip_clipboard_get
@@ -74,6 +86,9 @@ function! s:UpdateClipboard()
   endif
   let clipboard = substitute(clipboard, '\r', '', 'g')
   call setreg(g:wsl_clip_default_paste_register, clipboard)    
+  if g:wsl_clip_extra_paste_register != ''
+    call setreg(g:wsl_clip_extra_paste_register, clipboard)    
+  endif
 endfunction
 
 augroup WSLPut
