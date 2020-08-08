@@ -1,0 +1,81 @@
+*wsl_clip.txt*    Clipboard helper for vim in Windows Subsystem for Linux
+
+Version 1.0
+
+CONTENTS
+
+1. Introduction 	|wsl-clip-intro|
+2. Requirements 	|wsl-clip-requirements|
+3. Options		|wsl-clip-options|
+			|g:wsl_clip_clipboard_set|
+			|g:wsl_clip_clipboard_get|
+			|g:wsl_clip_default_paste_register|
+			|g:wsl_clip_extra_paste_register| 
+			|g:wsl_clip_strip_last_CRLF|
+
+==============================================================================
+INTRODUCTION 						*wsl-clip-intro*
+
+
+This plugin provides access to the Windows system clipboard for terminal Vim running in the Windows Subsystem for Linux (WSL). The default installation of Vim on WSL assumes no clipboard as WSL is running in a terminal and not with a window manager. It is designed to work in a similar fashion to setting `clipboard=unnamed` as it automatically puts any yanked text into the system clipboard and the contents of the system clipboard are automatically available for putting using the normal put commands. No special keys are required. There is no requirement to install vim on WSL with clipboard support (i.e installing vim-gnome) or installing an X server.
+ 
+==============================================================================
+REQUIREMENTS 						*wsl-clip-requirements*
+
+Vim v8.0.1206+
+https://github.com/pnetherwood/vim-term-focus
+
+The vim-term-focus plugin is required to allow Vim to detect change of focus
+from the terminal.
+
+Terminal is required to support Focus Reporting. See vim-term-focus plugin for
+more details.
+
+==============================================================================
+
+OPTIONS 						*wsl-clip-options*
+
+
+ 							*g:wsl_clip_clipboard_set*
+g:wsl_clip_clipboard_set	string 	(default "clip.exe")                            
+			The external command used to set the system clipboard
+			with the contents of the yank buffer. The command is
+			set to `clip.exe` by default unless `win32yank` is
+			is in the path which will be used instead.
+			The command must be on the path or the full path
+			specified.
+
+							*g:wsl_clip_clipboard_get*
+g:wsl_clip_clipboard_get 	string 	(default "powershell.exe -Command Get-Clipboard")
+			The external command use to get the system clipboard
+			which is then placed in the default paste register as
+			defined in |g:wsl_clip_default_paste_register|. The command is
+			set to `powershell.exe` by default unless `win32yank` is
+			is in the path which will be used instead.
+
+							*g:wsl_clip_default_paste_register*
+g:wsl_clip_default_paste_register 	string 	(default ")
+			The register that is set with the contents of the
+			system clipboard when focus is regained. The unnamed
+			register is the default so that that it can be used by
+			the put command with no register specified.
+
+							*g:wsl_clip_extra_paste_register*
+g:wsl_clip_extra_paste_register    string (default 1)
+			An additional register that the system clipboard is
+			written to in case of accidental overwriting of the
+			default paste register with a delete command (for
+			example).
+
+							*g:wsl_clip_strip_last_CRLF*
+g:wsl_clip_strip_last_CRLF 	boolean 	(default 0)
+			Automatically strip last CRLF characters from the
+			contents of the system clipboard before putting in the
+			paste register. Some clipboard programs add an extra
+			CRLF onto the clipboard. This strips them off if
+			necessary. If using `win32yank` this is done
+			automatically using the --crlf flag.
+
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:fen:fdl=0:fdm=marker:
