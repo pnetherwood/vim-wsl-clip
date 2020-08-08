@@ -43,11 +43,15 @@ Configuration
 
 The following variables can be added to your vimrc to change the behaviour:
 
-|                            Option | Description                                     |                                                            Default |
-|                               --- | ---                                             |                                                                --- |
-|          g:wsl_clip_clipboard_set | The command used to update the system clipboard |                            `clip.exe` or `win32yank.exe -i --crlf` |
-|          g:wsl_clip_clipboard_get | The command used to get the system clipboard    | `powershell.exe -Command Get-Clipboard` or `win32yank.exe -o --lf` |
-| g:wsl_clip_default_paste_register | The register that receives the system clipboard |                                                                  " |
+| Option                            | Description                                        | Default                                                            |
+| ---                               | ---                                                | ---                                                                |
+| g:wsl_clip_clipboard_set          | The command used to update the system clipboard    | `clip.exe` or `win32yank.exe -i --crlf`                            |
+| g:wsl_clip_clipboard_get          | The command used to get the system clipboard       | `powershell.exe -Command Get-Clipboard` or `win32yank.exe -o --lf` |
+| g:wsl_clip_default_paste_register | The register that receives the system clipboard    | "                                                                  |
+| g:wsl_clip_extra_paste_register   | The register that receives a copy of the clipboard | 1                                                                  |
+| g:wsl_clip_strip_last_CRLF        | Strip the last CRLF from the system clipboard      | 0
+
+The extra paste register is just another copy of the last clipboard and is handy for when you overwrite the default paste register.
 
 Operation
 ---------
@@ -82,10 +86,10 @@ yank register are then sent to the system clipboard using the clipboard program 
 feature only available since patch 8.0.1394.
 
 When focus is lost in the terminal the assumption is made that you are interacting with programs outside of the terminal such as a web
-browser for example. When the focus is lost the current system clipboard is stored using the clipboard program set in
-`g:wsl_clip_clipboard_get`. When focus is regained the system clipboard contents are compared to the one on focus lost. If they are
-different then the unnamed register is set to the clipboard contents. The `FocusLost` and `FocusGained` auto command events are used to
-detect entering and leaving the terminal. The terminal has to have Focus Reporting capability. See [https://github.com/pnetherwood/vim-term-focus](https://github.com/pnetherwood/vim-term-focus) for more details of supported terminals.
+browser for example. When the focus is then re gained the current system clipboard is stored using the clipboard program set in
+`g:wsl_clip_clipboard_get`. The `FocusGained` auto command event is used to detect entering after it has been leftthe terminal. The terminal
+has to have Focus Reporting capability. See [https://github.com/pnetherwood/vim-term-focus](https://github.com/pnetherwood/vim-term-focus)
+for more details of supported terminals.
 
 
 
