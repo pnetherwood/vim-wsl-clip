@@ -30,22 +30,24 @@ endif
 let s:save_cpo = &cpo
 set cpo&vim
 
-let win32Path = '/mnt/c/Windows/System32/'
-" Get the path to Windows executables from mtab in case user has overridden the default
-for  line in readfile('/etc/mtab')
-  if line =~ '^C:'
-    let win32Path = split(line, ' ')[1] . '/Windows/System32/'
-  endif
-endfor
-
-let default_set_cmd = win32Path . 'clip.exe'
-let default_get_cmd = win32Path . 'WindowsPowerShell/v1.0/powershell.exe -Command Get-Clipboard'
-let default_strip_last_CRLF = 1
 if executable('win32yank.exe')
   let default_set_cmd = 'win32yank.exe -i --crlf'
   let default_get_cmd = 'win32yank.exe -o --lf'
   let default_strip_last_CRLF  = 0
+else
+  let win32Path = '/c/Windows/System32/'
+  " Get the path to Windows executables from mtab in case user has overridden the default
+  for  line in readfile('/etc/mtab')
+    if line =~ 'path=C:'
+      let win32Path = split(line, ' ')[1] . '/Windows/System32/'
+    endif
+  endfor
+
+  let default_set_cmd = win32Path . 'clip.exe'
+  let default_get_cmd = win32Path . 'WindowsPowerShell/v1.0/powershell.exe -Command Get-Clipboard'
 endif
+
+let default_strip_last_CRLF = 1
 
 let g:wsl_clip_clipboard_set = get(g:, 'wsl_clip_clipboard_set', default_set_cmd)
 let g:wsl_clip_clipboard_get = get(g:, 'wsl_clip_clipboard_get', default_get_cmd)
