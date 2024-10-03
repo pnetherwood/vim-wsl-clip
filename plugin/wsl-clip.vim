@@ -30,9 +30,9 @@ endif
 let s:save_cpo = &cpo
 set cpo&vim
 
-if executable('win32yank.exe')
-  let default_set_cmd = 'win32yank.exe -i --crlf'
-  let default_get_cmd = 'win32yank.exe -o --lf'
+if executable('win32yank')
+  let default_set_cmd = 'win32yank -i --crlf'
+  let default_get_cmd = 'win32yank -o --lf'
   let default_strip_last_CRLF  = 0
 else
   let win32Path = '/c/Windows/System32/'
