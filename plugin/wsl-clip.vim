@@ -18,7 +18,7 @@ endif
 let s:isWSL = 0
 if has("unix")
   let lines = readfile("/proc/version")
-  if lines[0] =~ "Microsoft"
+  if lines[0] =~? "microsoft"
     let s:isWSL = 1
   endif
 endif
